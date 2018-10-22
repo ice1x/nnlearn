@@ -23,10 +23,10 @@ Y = np.array([[0],
 
 # случайно инициализируем веса, в среднем - 0
 np.random.seed(1)
-syn0 = 2 * np.random.random((3, 4)) - 1
-syn1 = 2 * np.random.random((4, 1)) - 1
+syn0 = 2 * np.random.random((3, 4)) - 1  # первый слой весов, Synapse 0, объединяет l0 с l1.
+syn1 = 2 * np.random.random((4, 1)) - 1  # второй слой весов, Synapse 1, объединяет l1 с l2.
 
-for j in xrange(60000):
+for j in range(60000):
 
     # проходим вперёд по слоям 0, 1 и 2
     l0 = X
@@ -37,7 +37,7 @@ for j in xrange(60000):
     l2_error = Y - l2
 
     if (j % 10000) == 0:
-        print "Error:" + str(np.mean(np.abs(l2_error)))
+        print("Error:" + str(np.mean(np.abs(l2_error))))
 
     # в какую сторону нужно двигаться?
     # если мы были уверены в предсказании, то сильно менять его не надо
