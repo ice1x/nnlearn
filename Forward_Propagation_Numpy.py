@@ -1,3 +1,6 @@
+"""
+https://dev.to/shamdasani/build-a-flexible-neural-network-with-backpropagation-in-python
+"""
 import numpy as np
 
 # X = (hours sleeping, hours studying), y = score on test
