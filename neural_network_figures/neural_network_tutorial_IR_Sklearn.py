@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score
 import numpy.random as r
 import matplotlib.pyplot as plt
 
-
+RESULT_SHAPE = 3
 path = os.path.abspath(os.path.curdir)
 shapes = {
     0: 'triangles',
@@ -21,7 +21,7 @@ def convert_y_to_vect(y):
     :param y:
     :return:
     """
-    y_vect = np.zeros((len(y), 10))
+    y_vect = np.zeros((len(y), RESULT_SHAPE))
     for i in range(len(y)):
         y_vect[i, y[i]] = 1
     return y_vect
@@ -160,7 +160,7 @@ if __name__ == "__main__":
     y_v_test = convert_y_to_vect(y_test)
 
     # setup the NN structure
-    nn_structure = [64, 28, 3]
+    nn_structure = [784, 28, RESULT_SHAPE]
     # train the NN
     W, b, avg_cost_func = train_nn(nn_structure, X_train, y_v_train)
     # plot the avg_cost_func
