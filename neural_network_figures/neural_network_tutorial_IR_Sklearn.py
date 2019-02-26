@@ -8,13 +8,17 @@ from sklearn.metrics import accuracy_score
 import numpy.random as r
 import matplotlib.pyplot as plt
 
+# setup the NN structure
 RESULT_SHAPE = 3
-path = os.path.abspath(os.path.curdir)
-shapes = {
+NN_STRUCTURE = [784, 300, RESULT_SHAPE]
+ITER_NUM = 1000
+PATH = os.path.abspath(os.path.curdir)
+SHAPES = {
     0: 'triangles',
     1: 'circles',
     2: 'squares'
 }
+
 
 def convert_y_to_vect(y):
     """
@@ -35,21 +39,21 @@ def f_deriv(x):
     return f(x) * (1 - f(x))
 
 
-def setup_and_init_weights(nn_structure):
+def setup_and_init_weights():
     W = {}
     b = {}
-    for l in range(1, len(nn_structure)):
-        W[l] = r.random_sample((nn_structure[l], nn_structure[l-1]))
-        b[l] = r.random_sample((nn_structure[l],))
+    for l in range(1, len(NN_STRUCTURE)):
+        W[l] = r.random_sample((NN_STRUCTURE[l], NN_STRUCTURE[l-1]))
+        b[l] = r.random_sample((NN_STRUCTURE[l],))
     return W, b
 
 
-def init_tri_values(nn_structure):
+def init_tri_values():
     tri_W = {}
     tri_b = {}
-    for l in range(1, len(nn_structure)):
-        tri_W[l] = np.zeros((nn_structure[l], nn_structure[l-1]))
-        tri_b[l] = np.zeros((nn_structure[l],))
+    for l in range(1, len(NN_STRUCTURE)):
+        tri_W[l] = np.zeros((NN_STRUCTURE[l], NN_STRUCTURE[l-1]))
+        tri_b[l] = np.zeros((NN_STRUCTURE[l],))
     return tri_W, tri_b
 
 
@@ -78,8 +82,8 @@ def calculate_hidden_delta(delta_plus_1, w_l, z_l):
     return np.dot(np.transpose(w_l), delta_plus_1) * f_deriv(z_l)
 
 
-def train_nn(nn_structure, X, y, iter_num=3000, alpha=0.25):
-    W, b = setup_and_init_weights(nn_structure)
+def train_nn(X, y, iter_num=ITER_NUM, alpha=0.25):
+    W, b = setup_and_init_weights()
     cnt = 0
     m = len(y)
     avg_cost_func = []
@@ -87,7 +91,7 @@ def train_nn(nn_structure, X, y, iter_num=3000, alpha=0.25):
     while cnt < iter_num:
         if cnt%1000 == 0:
             print('Iteration {} of {}'.format(cnt, iter_num))
-        tri_W, tri_b = init_tri_values(nn_structure)
+        tri_W, tri_b = init_tri_values()
         avg_cost = 0
         for i in range(len(y)):
             delta = {}
@@ -95,8 +99,8 @@ def train_nn(nn_structure, X, y, iter_num=3000, alpha=0.25):
             # gradient descent step
             h, z = feed_forward(X[i, :], W, b)
             # loop from nl-1 to 1 backpropagating the errors
-            for l in range(len(nn_structure), 0, -1):
-                if l == len(nn_structure):
+            for l in range(len(NN_STRUCTURE), 0, -1):
+                if l == len(NN_STRUCTURE):
                     delta[l] = calculate_out_layer_delta(y[i,:], h[l], z[l])
                     avg_cost += np.linalg.norm((y[i,:]-h[l]))
                 else:
@@ -107,7 +111,7 @@ def train_nn(nn_structure, X, y, iter_num=3000, alpha=0.25):
                     # trib^(l) = trib^(l) + delta^(l+1)
                     tri_b[l] += delta[l+1]
         # perform the gradient descent step for the weights in each layer
-        for l in range(len(nn_structure) - 1, 0, -1):
+        for l in range(len(NN_STRUCTURE) - 1, 0, -1):
             W[l] += -alpha * (1.0/m * tri_W[l])
             b[l] += -alpha * (1.0/m * tri_b[l])
         # complete the average cost calculation
@@ -127,7 +131,8 @@ def predict_y(W, b, X, n_layers):
 
 
 def rgb2gray(img):
-    return np.dot(img[..., :3], [0.299, 0.587, 0.114])
+    img = np.dot(img[..., :3], [0.299, 0.587, 0.114])
+    return 1 - img
 
 
 if __name__ == "__main__":
@@ -135,8 +140,8 @@ if __name__ == "__main__":
     # digits = load_digits()
     files = []  # for storing all the images path
     result = []
-    for index, shape in shapes.items():  # |
-        new_path = os.path.join(path, shape)  # |
+    for index, shape in SHAPES.items():  # |
+        new_path = os.path.join(PATH, shape)  # |
         for file_ in os.listdir(new_path):  # |How can I make this code shorter?
             files.append(os.path.join(new_path, file_))  # |
             result.append(index)
@@ -159,10 +164,8 @@ if __name__ == "__main__":
     y_v_train = convert_y_to_vect(y_train)
     y_v_test = convert_y_to_vect(y_test)
 
-    # setup the NN structure
-    nn_structure = [784, 28, RESULT_SHAPE]
     # train the NN
-    W, b, avg_cost_func = train_nn(nn_structure, X_train, y_v_train)
+    W, b, avg_cost_func = train_nn(X_train, y_v_train)
     # plot the avg_cost_func
     plt.plot(avg_cost_func)
     plt.ylabel('Average J')
