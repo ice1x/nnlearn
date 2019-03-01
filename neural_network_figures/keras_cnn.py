@@ -22,7 +22,7 @@ SHAPES = {
 
 batch_size = 128
 num_classes = 3
-epochs = 10
+epochs = 35
 
 # input image dimensions
 img_x, img_y = 28, 28
@@ -79,14 +79,38 @@ y_train = keras.utils.to_categorical(y_train, num_classes)
 y_test = keras.utils.to_categorical(y_test, num_classes)
 
 model = Sequential()
-model.add(Conv2D(40, kernel_size=(9, 9), strides=(1, 1),
-                 activation='tanh',
-                 input_shape=input_shape))
+model.add(Conv2D(
+    32,
+    kernel_size=(5, 5),
+    strides=(1, 1),
+    activation='tanh',
+    input_shape=input_shape
+))
 model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
-model.add(Conv2D(880, (3, 3), activation='tanh'))
+
+model.add(Conv2D(
+    40,
+    (5, 5),
+    activation='tanh'
+))
 model.add(MaxPooling2D(pool_size=(2, 2)))
+
+model.add(Conv2D(
+    88,
+    (3, 3),
+    activation='tanh'
+))
+model.add(MaxPooling2D(pool_size=2))
+
+model.add(Conv2D(
+    28*28,
+    (1, 1),
+    activation='tanh'
+))
+model.add(MaxPooling2D(pool_size=1))
+
 model.add(Flatten())
-model.add(Dense(1000, activation='tanh'))
+model.add(Dense(5000, activation='tanh'))
 model.add(Dense(num_classes, activation='softmax'))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
@@ -112,7 +136,7 @@ model.fit(x_train, y_train,
 score = model.evaluate(x_test, y_test, verbose=0)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
-plt.plot(range(1, 11), history.acc)
+plt.plot(range(1, epochs + 1), history.acc)
 plt.xlabel('Epochs')
 plt.ylabel('Accuracy')
 plt.show()
